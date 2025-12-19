@@ -511,7 +511,7 @@
             available.forEach(p => {
                 html += `<label style="display: block; margin: 10px 0; cursor: pointer;"><input type="checkbox" id="s_${id}_${p}" ${existing.includes(p) ? 'checked' : ''} value="${p}"> ${p}</label>`;
             });
-            html += '</div><button class="btn" onclick="confirmSharers(\'' + id + '\'); this.closest(\'div\').parentElement.remove();">✓</button>';
+            html += '</div><button class="btn" onclick="confirmSharers('id'); document.getElementById('modal-ID').remove();">✓</button>';
             modal.innerHTML = '<div>' + html + '</div>';
             document.body.appendChild(modal);
             modal.onclick = (e) => {
