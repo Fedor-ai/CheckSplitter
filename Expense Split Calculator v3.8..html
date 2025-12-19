@@ -503,6 +503,7 @@
 
         function showSharerModal(id, available) {
             const modal = document.createElement('div');
+            modal.id = 'modal-' + id;
             modal.style.cssText = 'display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000;';
 
             const existing = Array.from(document.querySelectorAll(`#sharers_${id} button`)).map(b => b.textContent.replace('×', '').trim());
