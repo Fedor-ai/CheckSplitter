@@ -508,7 +508,7 @@
     <div class="container">
         <div class="header">
             <div>
-                <h1>📈 Expense Split Calculator</h1>
+                <h1>💱 Expense Split Calculator</h1>
                 <div style="font-size: 12px; color: #999; margin-top: 4px;">powered by @Suvoro4ka</div>
             </div>
             <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
@@ -517,7 +517,7 @@
         <div class="content">
             <!-- Participants Section -->
             <div class="section">
-                <div class="section-title">👥 Участники</div>
+                <div class="section-title">🧑 Участники</div>
                 <div class="form-group">
                     <input type="text" id="participantInput" placeholder="Имя участника">
                 </div>
@@ -1056,7 +1056,7 @@
                     });
                     
                     html = `<div class="${classList}">
-                        <div class="debt-header">💚 ${typeText}</div>
+                        <div class="debt-header">🢁 ${typeText}</div>
                         <div class="debt-details">Детальная расшифровка:</div>
                         <div>${breakdown}</div>
                         <div class="debt-amount">Итого: ${position.toFixed(2)} ₽</div>
@@ -1078,7 +1078,7 @@
                     });
                     
                     html = `<div class="${classList}">
-                        <div class="debt-header">❤️ ${typeText}</div>
+                        <div class="debt-header">🡻 ${typeText}</div>
                         <div class="debt-details">Детальная расшифровка:</div>
                         <div>${breakdown}</div>
                         <div class="debt-amount">Итого: ${Math.abs(position).toFixed(2)} ₽</div>
@@ -1157,7 +1157,7 @@
             
             // Встречные платежи со сложением по парам
             html += `<div style="margin-top: 20px; padding: 15px; background: #fff9e6; border-radius: 6px;">
-                <div style="font-weight: 600; margin-bottom: 15px;">🔄 Встречные платежи (взаимные долги):</div>`;
+                <div style="font-weight: 600; margin-bottom: 15px;">🔁 Встречные платежи (взаимные долги):</div>`;
             
             const pairDebts = {}; // Группируем долги по парам {p1|p2: [{...}, {...}]}
             const processedPairs = new Set();
@@ -1369,7 +1369,7 @@
             
             // Встречные платежи
             html += `<div style="margin-top: 20px; padding: 20px; background: #fff9e6; border-radius: 8px; border: 1px solid #ffc107;">
-                <div style="font-weight: 600; margin-bottom: 15px; font-size: 14px;">🔄 Встречные платежи (взаимные долги)</div>`;
+                <div style="font-weight: 600; margin-bottom: 15px; font-size: 14px;">🔁 Встречные платежи (взаимные долги)</div>`;
             
             const pairDebts = {};
             const processedPairs = new Set();
@@ -1458,7 +1458,7 @@
                     html += `<div style="background: #e6ffe6; padding: 12px; border-radius: 4px; margin-bottom: 10px; border: 1px solid #ddd;">
                         <div style="font-weight: 600; margin-bottom: 8px; font-size: 12px;">⚖️ ${p1} ↔ ${p2}</div>
                         <div style="font-weight: 700; color: #22863a; font-size: 12px;">
-                            ✅ Встречные долги полностью сокращены
+                            ✅ Встречные долги полностью погашены
                         </div>
                     </div>`;
                 }
