@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Split Calculator v3.4 - Synchronized</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.3s;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .header {
+            background: rgba(30, 30, 50, 0.95);
+            color: #fff;
+        }
+
+        .header h1 {
+            font-size: 28px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .section {
+            background: rgba(30, 30, 50, 0.95);
+            color: #fff;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        body.dark-mode .section-title {
+            border-bottom-color: #8b9dff;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        body.dark-mode .form-group input, body.dark-mode .form-group select, body.dark-mode .form-group textarea {
+            background: #2a2a4a;
+            color: #fff;
+            border-color: #444;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .participant-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        body.dark-mode .participant-card {
+            background: #2a2a4a;
+            border-color: #3a3a5a;
+            border-left-color: #8b9dff;
+        }
+
+        .participant-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .debt-section {
+            margin-bottom: 12px;
+        }
+
+        .debt-section-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        body.dark-mode .debt-section-title {
+            color: #aaa;
+        }
+
+        .debt-item {
+            font-size: 14px;
+            padding-left: 16px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .debt-item-amount {
+            font-weight: 600;
+            color: #333;
+        }
+
+        body.dark-mode .debt-item-amount {
+            color: #fff;
+        }
+
+        .debt-icon-pay {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .debt-icon-receive {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .net-debt-display {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        body.dark-mode .net-debt-display {
+            background: rgba(255, 193, 7, 0.15);
+            border-left-color: #ffc107;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        body.dark-mode .empty-state {
+            color: #aaa;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .payment-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            border-left: 3px solid #667eea;
+        }
+
+        body.dark-mode .payment-item {
+            background: #2a2a4a;
+            border-left-color: #8b9dff;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>📈 Expense Split Calculator</h1>
+                <div style="font-size: 12px; color: #999; margin-top: 4px;">v3.4 - Synchronized Debts | powered by @Suvoro4ka</div>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </div>
+
+        <div class="content">
+            <!-- Participants Section -->
+            <div class="section">
+                <div class="section-title">👥 Участники</div>
+                <div class="form-group">
+                    <input type="text" id="participantInput" placeholder="Имя участника">
+                </div>
+                <button class="btn" onclick="addParticipant()">Добавить</button>
+                <div style="margin-top: 15px;" id="participantsList"></div>
+            </div>
+
+            <!-- Payment Entry Section -->
+            <div class="section">
+                <div class="section-title">🧾 Добавить платёж</div>
+                <div class="form-group">
+                    <label>Категория</label>
+                    <input type="text" id="category" placeholder="Ресторан" value="Ресторан">
+                </div>
+                <div class="form-group">
+                    <label>Кто платил</label>
+                    <select id="payer" onchange="updatePaymentParticipants()"></select>
+                </div>
+                <div class="form-group">
+                    <label>Участники платежа</label>
+                    <div id="paymentParticipants" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;"></div>
+                </div>
+                <div class="form-group">
+                    <label>Общий счет (₽)</label>
+                    <input type="number" id="amount" placeholder="0" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Блюда участников</label>
+                    <button class="btn btn-secondary btn-small" onclick="clearDishes()">Очистить все блюда</button>
+                    <div id="dishesContainer" style="margin-top: 10px;"></div>
+                    <button class="btn btn-secondary btn-small" onclick="addDishRow()" style="margin-top: 10px;">+ Добавить блюдо</button>
+                </div>
+                <button class="btn" onclick="addPayment()" style="width: 100%;">Записать платёж</button>
+            </div>
+
+            <!-- Synced Debts Section -->
+            <div class="section">
+                <div class="section-title">💳 Кто кому должен (Синхронизированно)</div>
+                <div id="syncedDebtsContainer"></div>
+            </div>
+
+            <!-- Optimal Payments Section -->
+            <div class="section">
+                <div class="section-title">⚡ Оптимальные платежи</div>
+                <div id="optimizedPaymentsContainer"></div>
+            </div>
+
+            <!-- Net Debts Reference Section -->
+            <div class="section full-width">
+                <div class="section-title">🔄 Встречные платежи (Взаимные долги и взаимозачет)</div>
+                <div id="netDebtsReferenceContainer"></div>
+            </div>
+
+            <!-- Detailed Calculation Section -->
+            <div class="section full-width">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div class="section-title" style="margin-bottom: 0;">📋 Расчеты по каждому платежу</div>
+                </div>
+                <div id="detailedCalculation"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // DATA STRUCTURES
+        // ============================================================================
+        let participants = [];
+        let payments = [];
+
+        // ============================================================================
+        // INITIALIZATION
+        // ============================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateUI();
+        });
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+
+        // ============================================================================
+        // DATA PERSISTENCE
+        // ============================================================================
+        function saveData() {
+            localStorage.setItem('participants', JSON.stringify(participants));
+            localStorage.setItem('payments', JSON.stringify(payments));
+            updateUI();
+        }
+
+        function loadData() {
+            const savedParticipants = localStorage.getItem('participants');
+            const savedPayments = localStorage.getItem('payments');
+            if (savedParticipants) participants = JSON.parse(savedParticipants);
+            if (savedPayments) payments = JSON.parse(savedPayments);
+        }
+
+        // ============================================================================
+        // PARTICIPANT MANAGEMENT
+        // ============================================================================
+        function addParticipant() {
+            const input = document.getElementById('participantInput');
+            const name = input.value.trim();
+            if (!name || participants.includes(name)) {
+                alert(name ? 'Участник уже добавлен' : 'Введите имя');
+                return;
+            }
+            participants.push(name);
+            input.value = '';
+            saveData();
+        }
+
+        function removeParticipant(name) {
+            if (confirm(`Удалить "${name}"?`)) {
+                participants = participants.filter(p => p !== name);
+                payments = payments.filter(p => p.payer !== name && !p.participants.includes(name));
+                saveData();
+            }
+        }
+
+        // ============================================================================
+        // PAYMENT MANAGEMENT
+        // ============================================================================
+        function updatePaymentParticipants() {
+            const payer = document.getElementById('payer').value;
+            const container = document.getElementById('paymentParticipants');
+            container.innerHTML = '';
+            participants.forEach(p => {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = 'p_' + p;
+                checkbox.value = p;
+                checkbox.checked = (p === payer);
+                checkbox.onchange = () => updateDishesUI();
+
+                const label = document.createElement('label');
+                label.htmlFor = 'p_' + p;
+                label.textContent = p;
+                label.style.cssText = 'display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none;';
+                label.appendChild(checkbox);
+                container.appendChild(label);
+            });
+            updateDishesUI();
+        }
+
+        function addDishRow() {
+            const selected = Array.from(document.querySelectorAll('#paymentParticipants input:checked')).map(cb => cb.value);
+            if (selected.length === 0) {
+                alert('Выберите участников');
+                return;
+            }
+
+            const container = document.getElementById('dishesContainer');
+            const id = 'dish_' + Date.now();
+            const row = document.createElement('div');
+            row.style.cssText = 'display: grid; grid-template-columns: 1fr 1.2fr auto; gap: 10px; margin-bottom: 8px; padding: 10px; background: #f0f0f0; border-radius: 6px;';
+            row.id = id;
+
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.placeholder = 'Блюдо';
+            nameInput.dataset.rowId = id;
+
+            const priceInput = document.createElement('input');
+            priceInput.type = 'number';
+            priceInput.placeholder = '0.00';
+            priceInput.step = '0.01';
+            priceInput.min = '0';
+            priceInput.dataset.rowId = id;
+
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-secondary btn-small';
+            btn.textContent = 'Участники';
+            btn.onclick = (e) => {
+                e.preventDefault();
+                showSharerModal(id, selected);
+            };
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn btn-danger btn-small';
+            delBtn.textContent = '✕';
+            delBtn.onclick = (e) => {
+                e.preventDefault();
+                row.remove();
+                const sharer = document.getElementById('sharers_' + id);
+                if (sharer) sharer.remove();
+            };
+
+            row.appendChild(nameInput);
+            row.appendChild(priceInput);
+            row.appendChild(btn);
+            row.appendChild(delBtn);
+
+            const sharers = document.createElement('div');
+            sharers.id = 'sharers_' + id;
+            sharers.style.cssText = 'grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 5px; margin-top: -5px;';
+
+            container.appendChild(row);
+            container.appendChild(sharers);
+        }
+
+        function showSharerModal(id, available) {
+            const modal = document.createElement('div');
+            modal.id = 'modal-' + id;
+            modal.style.cssText = 'display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000;';
+
+            const existing = Array.from(document.querySelectorAll(`#sharers_${id} button`)).map(b => b.textContent.replace('×', '').trim());
+
+            let html = '<div style="background: white; margin: 10% auto; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);"><h3>Участники блюда</h3><div style="margin: 20px 0;">';
+            available.forEach(p => {
+                html += `<label style="display: block; margin: 10px 0; cursor: pointer;"><input type="checkbox" id="s_${id}_${p}" ${existing.includes(p) ? 'checked' : ''} value="${p}"> ${p}</label>`;
+            });
+            html += '</div><button class="btn" onclick="confirmSharers(\'' + id + '\'); document.getElementById(\'modal-' + id + '\').remove();">✓</button>';
+            modal.innerHTML = '<div>' + html + '</div>';
+            document.body.appendChild(modal);
+            modal.onclick = (e) => {
+                if (e.target === modal) modal.remove();
+            };
+        }
+
+        function confirmSharers(id) {
+            const checked = Array.from(document.querySelectorAll(`input[id^="s_${id}_"]:checked`)).map(cb => cb.value);
+            const container = document.getElementById('sharers_' + id);
+            container.innerHTML = '';
+            checked.forEach(name => {
+                const tag = document.createElement('button');
+                tag.style.cssText = 'background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer;';
+                tag.textContent = name + ' ×';
+                tag.onclick = (e) => {
+                    e.preventDefault();
+                    tag.remove();
+                };
+                container.appendChild(tag);
+            });
+        }
+
+        function updateDishesUI() {}
+
+        function clearDishes() {
+            document.getElementById('dishesContainer').innerHTML = '';
+        }
+
+        function addPayment() {
+            const category = document.getElementById('category').value.trim() || 'Платёж';
+            const payer = document.getElementById('payer').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            if (!payer || isNaN(amount) || amount <= 0) {
+                alert('Проверьте поля');
+                return;
+            }
+
+            const dishes = [];
+            let totalPrice = 0;
+
+            document.querySelectorAll('#dishesContainer > div[id^="dish_"]').forEach(row => {
+                const nameInput = row.querySelector('input[type="text"]');
+                const priceInput = row.querySelector('input[type="number"]');
+                const id = row.id;
+                const sharers = Array.from(document.querySelectorAll(`#sharers_${id} button`)).map(b => b.textContent.replace('×', '').trim());
+
+                const name = nameInput.value.trim() || 'Блюдо';
+                const price = parseFloat(priceInput.value) || 0;
+
+                if (price > 0 && sharers.length > 0) {
+                    dishes.push({ name, price, sharers });
+                    totalPrice += price;
+                }
+            });
+
+            if (dishes.length === 0) {
+                alert('Добавьте блюда');
+                return;
+            }
+
+            const participantShares = {};
+            dishes.forEach(dish => {
+                const perPerson = dish.price / dish.sharers.length;
+                dish.sharers.forEach(sharer => {
+                    if (!participantShares[sharer]) {
+                        participantShares[sharer] = { total: 0, dishes: [] };
+                    }
+                    participantShares[sharer].total += perPerson;
+                    participantShares[sharer].dishes.push({ name: dish.name, amount: perPerson, sharersCount: dish.sharers.length });
+                });
+            });
+
+            const payment = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString('ru-RU'),
+                category,
+                payer,
+                amount,
+                dishes,
+                participants: Object.keys(participantShares),
+                participantShares,
+                totalDishAmount: totalPrice
+            };
+
+            payments.push(payment);
+            document.getElementById('amount').value = '';
+            clearDishes();
+            document.getElementById('payer').value = '';
+            document.getElementById('category').value = 'Ресторан';
+            updatePaymentParticipants();
+            saveData();
+        }
+
+        // ============================================================================
+        // CORE ALGORITHM: NET DEBTS CALCULATION (ВЗАИМОЗАЧЕТ)
+        // ============================================================================
+        
+        /**
+         * Рассчитывает прямые долги между всеми участниками
+         * debts[debtor][creditor] = amount (debtor должен creditor)
+         */
+        function calculateDirectDebts() {
+            const debts = {};
+            participants.forEach(p1 => {
+                debts[p1] = {};
+                participants.forEach(p2 => {
+                    if (p1 !== p2) debts[p1][p2] = 0;
+                });
+            });
+
+            payments.forEach(payment => {
+                const payer = payment.payer;
+                const coefficient = payment.amount / payment.totalDishAmount;
+
+                payment.participants.forEach(participant => {
+                    if (participant !== payer) {
+                        const owed = (payment.participantShares[participant].total || 0) * coefficient;
+                        debts[participant][payer] = (debts[participant][payer] || 0) + owed;
+                    }
+                });
+            });
+
+            return debts;
+        }
+
+        /**
+         * Рассчитывает NET DEBTS (после взаимозачета)
+         * netDebts[p1][p2] > 0 → p1 должен p2
+         * netDebts[p1][p2] < 0 → p2 должен p1
+         * netDebts[p1][p2] = 0 → no debt
+         */
+        function calculateNetDebts() {
+            const directDebts = calculateDirectDebts();
+            const netDebts = {};
+
+            participants.forEach(p1 => {
+                netDebts[p1] = {};
+                participants.forEach(p2 => {
+                    if (p1 !== p2) {
+                        const p1ToP2 = directDebts[p1][p2] || 0;
+                        const p2ToP1 = directDebts[p2][p1] || 0;
+                        netDebts[p1][p2] = p1ToP2 - p2ToP1;
+                    }
+                });
+            });
+
+            return netDebts;
+        }
+
+        // ============================================================================
+        // RENDERING: SYNCED DEBTS (based on net debts)
+        // ============================================================================
+        
+        function renderSyncedDebts() {
+            const container = document.getElementById('syncedDebtsContainer');
+
+            if (participants.length === 0 || payments.length === 0) {
+                container.innerHTML = '<div class="empty-state">Добавьте участников и платежи</div>';
+                return;
+            }
+
+            const netDebts = calculateNetDebts();
+            let html = '';
+
+            participants.forEach(participant => {
+                // Что этот участник должен платить (netDebt > 0)
+                const toPayList = [];
+                // Что он должен получить (netDebt < 0)
+                const toReceiveList = [];
+
+                participants.forEach(other => {
+                    if (participant !== other) {
+                        const netDebt = netDebts[participant][other];
+
+                        if (netDebt > 0.01) {
+                            toPayList.push({ name: other, amount: netDebt });
+                        } else if (netDebt < -0.01) {
+                            toReceiveList.push({ name: other, amount: -netDebt });
+                        }
+                    }
+                });
+
+                // Если нет долгов - пропускаем
+                if (toPayList.length === 0 && toReceiveList.length === 0) {
+                    return;
+                }
+
+                html += `<div class="participant-card">`;
+                html += `<div class="participant-name">👤 ${participant}</div>`;
+
+                if (toPayList.length > 0) {
+                    html += `<div class="debt-section">`;
+                    html += `<div class="debt-section-title"><span class="debt-icon-pay">💸 ДОЛЖЕН ПЛАТИТЬ</span></div>`;
+                    toPayList.forEach(item => {
+                        html += `<div class="debt-item">
+                            <span>${item.name}</span>
+                            <span class="debt-item-amount">${item.amount.toFixed(2)} ₽</span>
+                        </div>`;
+                    });
+                    html += `</div>`;
+                }
+
+                if (toReceiveList.length > 0) {
+                    html += `<div class="debt-section">`;
+                    html += `<div class="debt-section-title"><span class="debt-icon-receive">💰 ДОЛЖЕН ПОЛУЧИТЬ</span></div>`;
+                    toReceiveList.forEach(item => {
+                        html += `<div class="debt-item">
+                            <span>от ${item.name}</span>
+                            <span class="debt-item-amount">${item.amount.toFixed(2)} ₽</span>
+                        </div>`;
+                    });
+                    html += `</div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            container.innerHTML = html || '<div class="empty-state">Все в расчетах!</div>';
+        }
+
+        // ============================================================================
+        // RENDERING: OPTIMIZED PAYMENTS (from net debts)
+        // ============================================================================
+        
+        function renderOptimizedPayments() {
+            const container = document.getElementById('optimizedPaymentsContainer');
+
+            if (participants.length === 0 || payments.length === 0) {
+                container.innerHTML = '<div class="empty-state">Добавьте участников и платежи</div>';
+                return;
+            }
+
+            const netDebts = calculateNetDebts();
+            const transactions = optimizeFromNetDebts(netDebts);
+
+            if (transactions.length === 0) {
+                container.innerHTML = '<div class="empty-state">Все расчеты завершены!</div>';
+                return;
+            }
+
+            let html = '';
+            transactions.forEach((t, i) => {
+                html += `<div class="payment-item">
+                    ${i + 1}. <strong>${t.from}</strong> → <strong>${t.to}</strong>: <strong>${t.amount.toFixed(2)} ₽</strong>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        /**
+         * Оптимизирует платежи на основе NET DEBTS
+         * Гарантирует согласованность с разделом "Встречные платежи"
+         */
+        function optimizeFromNetDebts(netDebts) {
+            const balances = {};
+            participants.forEach(p => {
+                balances[p] = 0;
+            });
+
+            participants.forEach(debtor => {
+                participants.forEach(creditor => {
+                    const netDebt = netDebts[debtor][creditor];
+                    if (netDebt > 0.01) {
+                        balances[debtor] -= netDebt;
+                        balances[creditor] += netDebt;
+                    }
+                });
+            });
+
+            const debtors = participants.filter(p => balances[p] < -0.01)
+                .sort((a, b) => balances[a] - balances[b]);
+            const creditors = participants.filter(p => balances[p] > 0.01)
+                .sort((a, b) => balances[b] - balances[a]);
+
+            const transactions = [];
+            let i = 0, j = 0;
+
+            while (i < debtors.length && j < creditors.length) {
+                const debtor = debtors[i];
+                const creditor = creditors[j];
+                const amount = Math.min(Math.abs(balances[debtor]), balances[creditor]);
+                const rounded = Math.round(amount * 100) / 100;
+
+                if (rounded > 0) {
+                    transactions.push({ from: debtor, to: creditor, amount: rounded });
+                }
+
+                balances[debtor] += amount;
+                balances[creditor] -= amount;
+
+                if (Math.abs(balances[debtor]) < 0.01) i++;
+                if (Math.abs(balances[creditor]) < 0.01) j++;
+            }
+
+            return transactions;
+        }
+
+        // ============================================================================
+        // RENDERING: NET DEBTS REFERENCE (for verification)
+        // ============================================================================
+        
+        function renderNetDebtsReference() {
+            const container = document.getElementById('netDebtsReferenceContainer');
+
+            if (participants.length === 0 || payments.length === 0) {
+                container.innerHTML = '<div class="empty-state">Добавьте участников и платежи</div>';
+                return;
+            }
+
+            const netDebts = calculateNetDebts();
+            let html = '';
+
+            participants.forEach(p1 => {
+                participants.forEach(p2 => {
+                    if (p1 < p2) {
+                        const netDebt = netDebts[p1][p2];
+                        if (Math.abs(netDebt) > 0.01) {
+                            if (netDebt > 0) {
+                                html += `<div class="net-debt-display">
+                                    <strong>${p1}</strong> должен <strong>${p2}</strong>: <strong>${netDebt.toFixed(2)} ₽</strong>
+                                </div>`;
+                            } else {
+                                html += `<div class="net-debt-display">
+                                    <strong>${p2}</strong> должен <strong>${p1}</strong>: <strong>${(-netDebt).toFixed(2)} ₽</strong>
+                                </div>`;
+                            }
+                        }
+                    }
+                });
+            });
+
+            if (html === '') {
+                html = '<div class="empty-state">Встречные долги отсутствуют - все взаимозачеты выполнены!</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================================
+        // DETAILED CALCULATIONS (keeping original logic)
+        // ============================================================================
+        
+        function renderDetailedCalculation() {
+            const container = document.getElementById('detailedCalculation');
+
+            if (payments.length === 0) {
+                container.innerHTML = '<div class="empty-state">Нет платежей</div>';
+                return;
+            }
+
+            let html = '';
+
+            payments.forEach((payment, paymentIndex) => {
+                html += `<div class="payment-item" style="margin-bottom: 20px; border-left: 4px solid #667eea; padding: 15px;">
+                    <div style="font-weight: 600; margin-bottom: 10px;">
+                        ${payment.date} | ${payment.category} | Плательщик: <strong>${payment.payer}</strong> | Сумма: <strong>${payment.amount.toFixed(2)} ₽</strong>
+                    </div>
+                    <div style="margin-left: 10px; font-size: 13px;">`;
+
+                payment.dishes.forEach(dish => {
+                    html += `<div style="margin-bottom: 8px;">
+                        <strong>${dish.name}</strong> (${dish.price.toFixed(2)} ₽) → ${dish.sharers.join(', ')}
+                    </div>`;
+                });
+
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================================
+        // UI UPDATE
+        // ============================================================================
+        
+        function updateUI() {
+            // Update participants list
+            const list = document.getElementById('participantsList');
+            if (participants.length === 0) {
+                list.innerHTML = '<div class="empty-state">Нет участников</div>';
+            } else {
+                list.innerHTML = participants.map(p => 
+                    `<div style="display: inline-block; background: #e9ecef; padding: 8px 12px; border-radius: 20px; margin: 5px; margin-right: 8px;">
+                        <span>${p}</span>
+                        <button onclick="removeParticipant('${p}')" style="background: none; border: none; color: #dc3545; cursor: pointer; font-size: 18px; padding: 0; margin-left: 5px;">×</button>
+                    </div>`
+                ).join('');
+            }
+
+            // Update payer select
+            const payer = document.getElementById('payer');
+            payer.innerHTML = '<option value="">-- Выберите --</option>' + 
+                participants.map(p => `<option value="${p}">${p}</option>`).join('');
+
+            // Render all sections
+            renderSyncedDebts();
+            renderOptimizedPayments();
+            renderNetDebtsReference();
+            renderDetailedCalculation();
+        }
+    </script>
+</body>
+</html>
